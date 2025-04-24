@@ -88,4 +88,28 @@ class CanvasViewController: UIViewController, PKToolPickerObserver, PKCanvasView
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         canvasView.zoomScale = scrollView.zoomScale
     }
+    
+    func invertStrokeColors(for backgroundColor: UIColor) {
+        let drawing = canvasView.drawing
+
+        let newStrokes = drawing.strokes.map { stroke in
+            let originalInk = stroke.ink
+            let inverted = invertedColor(from: originalInk.color, against: backgroundColor)
+            let newInk = PKInk(originalInk.inkType, color: inverted)
+
+            return PKStroke(ink: newInk, path: stroke.path)
+        }
+
+        canvasView.drawing = PKDrawing(strokes: newStrokes)
+    }
+
+    
+    func invertedColor(from color: UIColor, against background: UIColor) -> UIColor {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+
+        return UIColor(red: 1.0 - r, green: 1.0 - g, blue: 1.0 - b, alpha: a)
+    }
+
 }
+

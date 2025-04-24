@@ -10,7 +10,6 @@ import SwiftUI
 struct CanvasView: UIViewControllerRepresentable {
     
     @Binding var contentMode: ContentMode
-    @State private var canvasVC: CanvasViewController?
 
     class Coordinator: NSObject {
         var parent: CanvasView
@@ -24,9 +23,8 @@ struct CanvasView: UIViewControllerRepresentable {
     }
 
     func makeUIViewController(context: Context) -> CanvasViewController {
-        let canvasVC = CanvasViewController()
-        self.canvasVC = canvasVC
-        return canvasVC
+        return CanvasViewController()
+        
     }
 
     func updateUIViewController(_ uiViewController: CanvasViewController, context: Context) {
@@ -34,7 +32,8 @@ struct CanvasView: UIViewControllerRepresentable {
         
         UIView.animate(withDuration: 0.3) {
             uiViewController.canvasView.backgroundColor = contentMode == .light ? .white : .black
-
+            uiViewController.scrollView.backgroundColor = contentMode == .light ? .white : .black
+            uiViewController.invertStrokeColors(for: contentMode == .light ? .white : .black)
         }
     }
 }
