@@ -1,9 +1,3 @@
-//
-//  Drawnotes.md
-//  DrawNotes
-//
-//  Created by Arkaprava Ghosh on 24/04/25.
-//
 # ✍️ DrawNotes
 
 **DrawNotes** is a clean and simple drawing and note-scribbling app, born out of frustration with cluttered experiences in other apps like Apple Notes. Whether you're jotting quick ideas or sketching out something detailed, DrawNotes provides a smooth and focused writing surface.
