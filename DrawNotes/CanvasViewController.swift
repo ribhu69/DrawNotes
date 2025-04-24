@@ -1,3 +1,14 @@
+//
+//  CanvasViewController.swift
+//  DrawNotes
+//
+//  Created by Arkaprava Ghosh on 24/04/25.
+//
+
+import UIKit
+import SwiftUI
+import PencilKit
+
 class CanvasViewController: UIViewController, PKToolPickerObserver, PKCanvasViewDelegate, UIScrollViewDelegate {
     var canvasView: PKCanvasView!
     let scrollView = UIScrollView()
