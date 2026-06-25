@@ -11,15 +11,14 @@ final class CanvasViewController: UIViewController {
     var onImageItemsChanged: (([ImageItem]) -> Void)?
 
     var template: CanvasTemplate = .blank {
-        didSet { applyTemplate() }
+        didSet { templateView.template = template }
     }
 
     // MARK: - Private — Canvas
 
     private(set) var canvasView: PKCanvasView!
     private var toolPicker: PKToolPicker!
-    private var templateView: UIView!
-    private var marginLineView: UIView!
+    private var templateView: CanvasTemplateView!
     private var saveWorkItem: DispatchWorkItem?
 
     // MARK: - Private — Images
@@ -33,9 +32,9 @@ final class CanvasViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        setupTemplateLayer()
+        setupTemplateView()
         setupCanvas()
-        applyTemplate()
+        templateView.template = template
         loadImageItems(initialImageItems)
     }
 
@@ -60,17 +59,10 @@ final class CanvasViewController: UIViewController {
         }
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-            applyTemplate()
-        }
-    }
-
     // MARK: - Setup
 
-    private func setupTemplateLayer() {
-        templateView = UIView()
+    private func setupTemplateView() {
+        templateView = CanvasTemplateView()
         templateView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(templateView)
         NSLayoutConstraint.activate([
@@ -78,17 +70,6 @@ final class CanvasViewController: UIViewController {
             templateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             templateView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             templateView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        marginLineView = UIView()
-        marginLineView.translatesAutoresizingMaskIntoConstraints = false
-        marginLineView.isHidden = true
-        view.addSubview(marginLineView)
-        NSLayoutConstraint.activate([
-            marginLineView.topAnchor.constraint(equalTo: view.topAnchor),
-            marginLineView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            marginLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 88),
-            marginLineView.widthAnchor.constraint(equalToConstant: 1)
         ])
     }
 
@@ -98,7 +79,7 @@ final class CanvasViewController: UIViewController {
         canvasView.drawing = initialDrawing
         canvasView.delegate = self
         canvasView.drawingPolicy = .anyInput
-        canvasView.backgroundColor = .clear
+        canvasView.backgroundColor = .clear   // template shows through
         canvasView.alwaysBounceVertical = true
         canvasView.showsVerticalScrollIndicator = true
         canvasView.showsHorizontalScrollIndicator = false
@@ -114,28 +95,12 @@ final class CanvasViewController: UIViewController {
         toolPicker = PKToolPicker()
         toolPicker.addObserver(canvasView)
 
-        // Tap on empty canvas area → deselect images
         let deselectTap = UITapGestureRecognizer(target: self, action: #selector(deselectAllImages))
         deselectTap.delegate = self
         canvasView.addGestureRecognizer(deselectTap)
     }
 
-    // MARK: - Template
-
-    private func applyTemplate() {
-        guard isViewLoaded else { return }
-        let dark = traitCollection.userInterfaceStyle == .dark
-
-        templateView.backgroundColor = template.patternImage(dark: dark)
-            .map { UIColor(patternImage: $0) } ?? .clear
-
-        marginLineView.isHidden = !template.hasMarginLine
-        marginLineView.backgroundColor = dark
-            ? UIColor(red: 0.9, green: 0.25, blue: 0.25, alpha: 0.5)
-            : UIColor(red: 0.85, green: 0.15, blue: 0.15, alpha: 0.5)
-    }
-
-    // MARK: - External Updates (from SwiftUI)
+    // MARK: - External Updates
 
     func loadDrawing(_ drawing: PKDrawing) {
         guard canvasView.drawing != drawing else { return }
@@ -150,11 +115,9 @@ final class CanvasViewController: UIViewController {
 
     func addImage(_ image: UIImage) {
         let offset = canvasView.contentOffset
-        let visible = CGRect(
-            x: offset.x, y: offset.y,
-            width: canvasView.bounds.width,
-            height: canvasView.bounds.height
-        )
+        let visible = CGRect(x: offset.x, y: offset.y,
+                             width: canvasView.bounds.width,
+                             height: canvasView.bounds.height)
         let center = CGPoint(x: visible.midX, y: visible.midY)
         let maxDim = min(visible.width * 0.65, 480)
         let aspect = image.size.width / image.size.height
@@ -185,9 +148,7 @@ final class CanvasViewController: UIViewController {
 
     // MARK: - Deselect
 
-    @objc private func deselectAllImages() {
-        deselectAll()
-    }
+    @objc private func deselectAllImages() { deselectAll() }
 
     private func deselectAll() {
         selectedImageID = nil
@@ -207,11 +168,16 @@ final class CanvasViewController: UIViewController {
     }
 }
 
-// MARK: - PKCanvasViewDelegate
+// MARK: - PKCanvasViewDelegate + UIScrollViewDelegate
 
 extension CanvasViewController: PKCanvasViewDelegate {
     func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
         scheduleSave()
+    }
+
+    /// Called on every scroll frame — sync template phase so lines track content position.
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        templateView.scrollOffset = scrollView.contentOffset
     }
 }
 
