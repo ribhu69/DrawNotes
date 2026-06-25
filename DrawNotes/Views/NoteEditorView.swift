@@ -17,6 +17,8 @@ struct NoteEditorView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
+            Color(UIColor.systemBackground).ignoresSafeArea()
+
             CanvasRepresentable(
                 drawing: Binding(
                     get: { note.drawing },

@@ -11,7 +11,10 @@ final class CanvasViewController: UIViewController {
     var onImageItemsChanged: (([ImageItem]) -> Void)?
 
     var template: CanvasTemplate = .blank {
-        didSet { templateView.template = template }
+        didSet {
+            guard isViewLoaded else { return }
+            templateView.template = template
+        }
     }
 
     // MARK: - Private — Canvas
