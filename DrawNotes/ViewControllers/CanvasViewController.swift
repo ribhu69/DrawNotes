@@ -104,7 +104,7 @@ final class CanvasViewController: UIViewController {
             self?.runShapeRecognition()
         }
         shapeWorkItem = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.38, execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8, execute: item)
     }
 
     private func runShapeRecognition() {
