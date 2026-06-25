@@ -5,17 +5,13 @@ struct NoteEditorView: View {
     @State var note: Note
     @ObservedObject var store: NoteStore
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.colorScheme) private var colorScheme
 
-    // Toolbar state
-    @State private var shapeRecognitionEnabled = true
     @State private var fingerInputEnabled = false
     @State private var showTitleEditor = false
     @State private var draftTitle = ""
 
     var body: some View {
         ZStack(alignment: .top) {
-            // Full-screen canvas — drawing binding backed by the note
             CanvasRepresentable(
                 drawing: Binding(
                     get: { note.drawing },
@@ -24,16 +20,13 @@ struct NoteEditorView: View {
                         store.updateNote(note)
                     }
                 ),
-                shapeRecognitionEnabled: shapeRecognitionEnabled,
                 fingerInputEnabled: fingerInputEnabled
             )
             .ignoresSafeArea()
 
-            // Floating top bar
             topBar
         }
         .onDisappear {
-            // Commit title edit on close even if the user didn't press return
             if showTitleEditor {
                 note.title = draftTitle
                 store.updateNote(note)
@@ -49,7 +42,7 @@ struct NoteEditorView: View {
             Spacer()
             titleControl
             Spacer()
-            controlRow
+            fingerToggle
         }
         .padding(.horizontal, 14)
         .padding(.top, 6)
@@ -96,32 +89,15 @@ struct NoteEditorView: View {
         }
     }
 
-    private var controlRow: some View {
-        HStack(spacing: 8) {
-            // Finger / pencil toggle
-            Button {
-                fingerInputEnabled.toggle()
-            } label: {
-                Image(systemName: fingerInputEnabled ? "hand.point.up.fill" : "hand.point.up")
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 36, height: 36)
-                    .foregroundStyle(fingerInputEnabled ? Color.accentColor : .secondary)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-
-            // Shape recognition toggle
-            Button {
-                shapeRecognitionEnabled.toggle()
-            } label: {
-                Image(systemName: "wand.and.stars")
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 36, height: 36)
-                    .foregroundStyle(shapeRecognitionEnabled ? Color.accentColor : .secondary)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-        }
+    private var fingerToggle: some View {
+        TooltipButton(
+            systemImage: fingerInputEnabled ? "hand.point.up.fill" : "hand.point.up",
+            tooltip: fingerInputEnabled
+                ? "Finger draws — tap to switch to scroll"
+                : "Finger scrolls — tap to draw with finger",
+            isActive: fingerInputEnabled,
+            action: { fingerInputEnabled.toggle() }
+        )
     }
 
     // MARK: - Helpers
