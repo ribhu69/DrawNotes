@@ -1,5 +1,6 @@
 import SwiftUI
 import PencilKit
+import PhotosUI
 
 struct NoteEditorView: View {
     @State var note: Note
@@ -9,6 +10,10 @@ struct NoteEditorView: View {
     @State private var fingerInputEnabled = false
     @State private var showTitleEditor = false
     @State private var draftTitle = ""
+
+    // Image picker
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var pendingImage: UIImage?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -20,12 +25,30 @@ struct NoteEditorView: View {
                         store.updateNote(note)
                     }
                 ),
+                imageItems: Binding(
+                    get: { note.imageItems },
+                    set: { newItems in
+                        note.imageItems = newItems
+                        store.updateNote(note)
+                    }
+                ),
+                pendingImage: $pendingImage,
                 fingerInputEnabled: fingerInputEnabled,
                 template: note.template
             )
             .ignoresSafeArea()
 
             topBar
+        }
+        .onChange(of: selectedPhotoItem) { item in
+            guard let item else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    pendingImage = image
+                }
+                selectedPhotoItem = nil
+            }
         }
         .onDisappear {
             if showTitleEditor {
@@ -44,6 +67,7 @@ struct NoteEditorView: View {
             titleControl
             Spacer()
             HStack(spacing: 8) {
+                photoPickerButton
                 templateMenu
                 fingerToggle
             }
@@ -89,6 +113,23 @@ struct NoteEditorView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: - Photo Picker
+
+    private var photoPickerButton: some View {
+        PhotosPicker(
+            selection: $selectedPhotoItem,
+            matching: .images,
+            photoLibrary: .shared()
+        ) {
+            Image(systemName: "photo.badge.plus")
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 36, height: 36)
+                .foregroundStyle(.secondary)
+                .background(.ultraThinMaterial, in: Circle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Template Menu
