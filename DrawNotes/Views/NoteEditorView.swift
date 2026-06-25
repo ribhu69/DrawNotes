@@ -20,7 +20,8 @@ struct NoteEditorView: View {
                         store.updateNote(note)
                     }
                 ),
-                fingerInputEnabled: fingerInputEnabled
+                fingerInputEnabled: fingerInputEnabled,
+                template: note.template
             )
             .ignoresSafeArea()
 
@@ -42,16 +43,17 @@ struct NoteEditorView: View {
             Spacer()
             titleControl
             Spacer()
-            fingerToggle
+            HStack(spacing: 8) {
+                templateMenu
+                fingerToggle
+            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 6)
     }
 
     private var backButton: some View {
-        Button {
-            dismiss()
-        } label: {
+        Button { dismiss() } label: {
             Image(systemName: "chevron.left")
                 .font(.system(size: 16, weight: .semibold))
                 .frame(width: 36, height: 36)
@@ -88,6 +90,29 @@ struct NoteEditorView: View {
             .buttonStyle(.plain)
         }
     }
+
+    // MARK: - Template Menu
+
+    private var templateMenu: some View {
+        Menu {
+            ForEach(CanvasTemplate.allCases, id: \.self) { t in
+                Button {
+                    note.template = t
+                    store.updateNote(note)
+                } label: {
+                    Label(t.displayName, systemImage: t.iconName)
+                }
+            }
+        } label: {
+            Image(systemName: note.template == .blank ? "doc" : note.template.iconName)
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 36, height: 36)
+                .foregroundStyle(note.template == .blank ? .secondary : Color.accentColor)
+                .background(.ultraThinMaterial, in: Circle())
+        }
+    }
+
+    // MARK: - Finger Toggle
 
     private var fingerToggle: some View {
         TooltipButton(

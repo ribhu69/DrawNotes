@@ -8,10 +8,16 @@ final class CanvasViewController: UIViewController {
     var initialDrawing: PKDrawing = PKDrawing()
     var onDrawingChanged: ((PKDrawing) -> Void)?
 
+    var template: CanvasTemplate = .blank {
+        didSet { applyTemplate() }
+    }
+
     // MARK: - Private
 
     private(set) var canvasView: PKCanvasView!
     private var toolPicker: PKToolPicker!
+    private var templateView: UIView!
+    private var marginLineView: UIView!
     private var saveWorkItem: DispatchWorkItem?
 
     // MARK: - Lifecycle
@@ -19,7 +25,9 @@ final class CanvasViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        setupTemplate()
         setupCanvas()
+        applyTemplate()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -43,7 +51,40 @@ final class CanvasViewController: UIViewController {
         }
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            applyTemplate()
+        }
+    }
+
     // MARK: - Setup
+
+    private func setupTemplate() {
+        // Template sits below the canvas, fills the full view, stays fixed.
+        // Since the patterns are repeating tiles, the visual stays correct at any scroll offset.
+        templateView = UIView()
+        templateView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(templateView)
+        NSLayoutConstraint.activate([
+            templateView.topAnchor.constraint(equalTo: view.topAnchor),
+            templateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            templateView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            templateView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        // Red margin line — only visible for the Ruled template
+        marginLineView = UIView()
+        marginLineView.translatesAutoresizingMaskIntoConstraints = false
+        marginLineView.isHidden = true
+        view.addSubview(marginLineView)
+        NSLayoutConstraint.activate([
+            marginLineView.topAnchor.constraint(equalTo: view.topAnchor),
+            marginLineView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            marginLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 88),
+            marginLineView.widthAnchor.constraint(equalToConstant: 1)
+        ])
+    }
 
     private func setupCanvas() {
         canvasView = PKCanvasView()
@@ -51,7 +92,8 @@ final class CanvasViewController: UIViewController {
         canvasView.drawing = initialDrawing
         canvasView.delegate = self
         canvasView.drawingPolicy = .anyInput
-        canvasView.backgroundColor = .systemBackground
+        // Clear so the template view shows through
+        canvasView.backgroundColor = .clear
         canvasView.alwaysBounceVertical = true
         canvasView.showsVerticalScrollIndicator = true
         canvasView.showsHorizontalScrollIndicator = false
@@ -66,6 +108,24 @@ final class CanvasViewController: UIViewController {
 
         toolPicker = PKToolPicker()
         toolPicker.addObserver(canvasView)
+    }
+
+    // MARK: - Template Rendering
+
+    private func applyTemplate() {
+        guard isViewLoaded else { return }
+        let dark = traitCollection.userInterfaceStyle == .dark
+
+        if let tile = template.patternImage(dark: dark) {
+            templateView.backgroundColor = UIColor(patternImage: tile)
+        } else {
+            templateView.backgroundColor = .clear
+        }
+
+        marginLineView.isHidden = !template.hasMarginLine
+        marginLineView.backgroundColor = dark
+            ? UIColor(red: 0.9, green: 0.25, blue: 0.25, alpha: 0.55)
+            : UIColor(red: 0.85, green: 0.15, blue: 0.15, alpha: 0.55)
     }
 
     // MARK: - External Updates

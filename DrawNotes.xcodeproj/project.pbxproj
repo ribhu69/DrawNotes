@@ -13,18 +13,18 @@
 		55B9B7474FA651A96CF1D220 /* NoteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E98DCAB2894E18BACDB6CF /* NoteCard.swift */; };
 		7D4BC8DCDE2EF759A53B0EE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E847156CE60EBD9D9E223C5A /* Assets.xcassets */; };
 		B4698DCFFF61ED6A7302CA9F /* NoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61730190D8924892A6936AAB /* NoteStore.swift */; };
+		B8A118757D5E62D4ADD18AC7 /* CanvasTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156F35ECB4DAA291A565B496 /* CanvasTemplate.swift */; };
 		C4AE8398FD692BBDB1D98E37 /* DrawNotesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D8F88B3F1A1C7A9EA259DD /* DrawNotesApp.swift */; };
 		C65A0A972365FDE427EAA57B /* CanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E8504A08BC3C7F54196BD7 /* CanvasViewController.swift */; };
 		E121650AC95B150D5E166674 /* TooltipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED4B14CC6B61980B9AE9267 /* TooltipButton.swift */; };
-		EFEE829BFF7B003F1FABC473 /* ShapeRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C19C66EA945A148D3345020 /* ShapeRecognizer.swift */; };
 		EFF477370CABD5165771CBC4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97B3292ABDF2D7C9C470B1FA /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		156F35ECB4DAA291A565B496 /* CanvasTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasTemplate.swift; sourceTree = "<group>"; };
 		250B4DB98A7AAC633E8164F8 /* DrawNotes.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DrawNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4ED4B14CC6B61980B9AE9267 /* TooltipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TooltipButton.swift; sourceTree = "<group>"; };
 		61730190D8924892A6936AAB /* NoteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteStore.swift; sourceTree = "<group>"; };
-		6C19C66EA945A148D3345020 /* ShapeRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeRecognizer.swift; sourceTree = "<group>"; };
 		73DF843910F9C7B49DB4DF26 /* CanvasRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasRepresentable.swift; sourceTree = "<group>"; };
 		7F5F3CA93168967D4084AF95 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		97B3292ABDF2D7C9C470B1FA /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -40,7 +40,7 @@
 		26BB963142539972D850CEF1 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				6C19C66EA945A148D3345020 /* ShapeRecognizer.swift */,
+				156F35ECB4DAA291A565B496 /* CanvasTemplate.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -184,6 +184,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				445DFB4BCE868EDC3024A2C7 /* CanvasRepresentable.swift in Sources */,
+				B8A118757D5E62D4ADD18AC7 /* CanvasTemplate.swift in Sources */,
 				C65A0A972365FDE427EAA57B /* CanvasViewController.swift in Sources */,
 				C4AE8398FD692BBDB1D98E37 /* DrawNotesApp.swift in Sources */,
 				EFF477370CABD5165771CBC4 /* HomeView.swift in Sources */,
@@ -191,7 +192,6 @@
 				55B9B7474FA651A96CF1D220 /* NoteCard.swift in Sources */,
 				14828643031E7717C872AB4C /* NoteEditorView.swift in Sources */,
 				B4698DCFFF61ED6A7302CA9F /* NoteStore.swift in Sources */,
-				EFEE829BFF7B003F1FABC473 /* ShapeRecognizer.swift in Sources */,
 				E121650AC95B150D5E166674 /* TooltipButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
